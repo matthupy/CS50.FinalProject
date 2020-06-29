@@ -33,13 +33,13 @@ Home
                             {% for tag in tags %}
                                 {% if tag.toTag == user %}
                                     <tr>
-                                        <td style="font-weight:bold">{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                        <td style="font-weight:bold"><a href="{% url 'user' username=tag.fromTag %}">{{ tag.fromTag }}</a> tagged <a href="{% url 'user' username=tag.toTag %}">{{ tag.toTag }}</a></td>
                                         <td style="font-weight:bold">{{ tag.timestamp }}</td>
                                         <td style="font-weight:bold">{{ tag.message }} </td>
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                        <td><a href="{% url 'user' username=tag.fromTag %}">{{ tag.fromTag }}</a> tagged <a href="{% url 'user' username=tag.toTag %}">{{ tag.toTag }}</a></td>
                                         <td>{{ tag.timestamp }}</td>
                                         <td>{{ tag.message }} </td>
                                     </tr>
