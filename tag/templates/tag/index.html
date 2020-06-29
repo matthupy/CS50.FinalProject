@@ -9,13 +9,16 @@ Home
 
 {% block content %}
     <div class="container card-container">
-        <h5>{{ itUser }} is it!</h5>
+        <legend class="border-bottom mb-4">{{ itUser }} is it!</legend>
+        <p>{{ mostTaggedUser }} has been tagged the most, {{ mostTaggedCount }} times!</p>
         <button type="button" id="openTagModal" class="newTagModal btn btn-primary" data-toggle="modal" data-target="#tagModal" disabled=true>
             Tag a Friend!
         </button>
     </div>
     <br>
+    <br>
     <div class="container card-container">
+        <legend class="border-bottom mb-4">Recent Tags</legend>
         <div class="row">
             <div class="col">
                 {% if tags %}
@@ -26,11 +29,19 @@ Home
                             <th>Message</th>
                         </tr>
                         {% for tag in tags %}
-                            <tr>
-                                <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
-                                <td>{{ tag.timestamp }}</td>
-                                <td>{{ tag.message }} </td>
-                            </tr>
+                            {% if tag.toTag == user %}
+                                <tr>
+                                    <td style="font-weight:bold">{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                    <td style="font-weight:bold">{{ tag.timestamp }}</td>
+                                    <td style="font-weight:bold">{{ tag.message }} </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                    <td>{{ tag.timestamp }}</td>
+                                    <td>{{ tag.message }} </td>
+                                </tr>
+                            {% endif %}
                         {% empty %}
 
                         {% endfor %}

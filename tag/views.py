@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
@@ -20,9 +21,15 @@ def index(request):
     if (tags.first() is not None):
         itUser = tags.first().toTag
 
+    # Gather some statistics
+    mostTaggedObject = Tag.objects.all().values('toTag').annotate(total=Count('toTag')).order_by('-total').first()
+    mostTaggedUser = User.objects.get(pk=mostTaggedObject['toTag'])
+
     context = {
         'tags': tags,
         'itUser': itUser,
+        'mostTaggedUser': mostTaggedUser,
+        'mostTaggedCount': mostTaggedObject['total'],
         'tagModelForm': tagModelForm,
     }
 
@@ -32,16 +39,23 @@ def index(request):
 def newTag(request):
     """ Create a new Tag from a Post request """
     if (request.method == "POST"):
-        toUserId = request.POST.get('toTag')
-        message = request.POST.get('message')
+        # Make sure that the request user is "it", otherwise redirect them back to index
+        itUser = Tag.objects.all().order_by("-timestamp").first().toTag
 
-        # Get the relavent user object
-        toUser = User.objects.get(pk=toUserId)
+        if (itUser == request.user):
+            toUserId = request.POST.get('toTag')
+            message = request.POST.get('message')
 
-        # Create the tag
-        newTag = Tag.objects.create(fromTag=request.user, toTag=toUser, message=message)
+            # Get the relavent user object
+            toUser = User.objects.get(pk=toUserId)
 
-        # Do something
-        return HttpResponse({'newTag':newTag}, content_type='application/json')
+            # Create the tag
+            newTag = Tag.objects.create(fromTag=request.user, toTag=toUser, message=message)
+
+            # Do something
+            return HttpResponse({'newTag':newTag}, content_type='application/json')
+
+        else:
+            return redirect('index')
     else:
         return redirect('index')
