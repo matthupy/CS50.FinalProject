@@ -1,0 +1,55 @@
+{% extends "tag/layout.html" %}
+
+{% block title %}
+{{ user.username }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md container card-container">
+            <legend class="border-bottom mb-4">Number of Times Tagged</legend>
+            <h1 style="text-align: center;">{{ timesTagged }}</h1>
+        </div>
+        <div class="col-md container card-container">
+            <legend class="border-bottom mb-4">Most Frequent Tagger</legend>
+            <h1 style="text-align: center;">{{ mostTaggedUser }}</h1>
+        </div>
+        <div class="col-md container card-container">
+            <legend class="border-bottom mb-4">Tags This Week</legend>
+            <h1 style="text-align: center;">{{ tagsThisWeek }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg container card-container">
+            <legend class="border-bottom mb-4">Recent Tags</legend>
+            <div class="row">
+                <div class="col">
+                    {% if tags %}
+                        <table id="tagsTable">
+                            <tr>
+                                <th>Tagged By</th>
+                                <th>Timestamp</th>
+                                <th>Message</th>
+                            </tr>
+                            {% for tag in tags %}
+                            <tr>
+                                <td><a href="{% url 'user' username=tag.fromTag %}">{{ tag.fromTag }}</a></td>
+                                <td>{{ tag.timestamp }}</td>
+                                <td>{{ tag.message }} </td>
+                            </tr>
+                            {% empty %}
+
+                            {% endfor %}
+
+                        </table>
+
+                    {% else %}
+                        <p>No tags yet! Tag one of your friends to get things started!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

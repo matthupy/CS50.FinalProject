@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -34,6 +35,42 @@ def index(request):
     }
 
     return render(request, "tag/index.html", context)
+
+@login_required(login_url='/login/')
+def user(request, username):
+    # Get the user object
+    userObject = User.objects.get(username=username)
+
+    # Get Statistics
+    timesTaggedObject = Tag.objects.all().values('toTag').filter(toTag=userObject).annotate(total=Count('toTag')).order_by('-total').first()
+    if (timesTaggedObject is not None):
+        timesTagged = timesTaggedObject['total'] or 0
+    else:
+        timesTagged = 0
+
+    mostTaggedUserId = Tag.objects.all().values('fromTag').filter(toTag=userObject).annotate(total=Count('fromTag')).order_by('-total').first()
+    if (mostTaggedUserId is not None):
+        mostTaggedUser = User.objects.get(pk=mostTaggedUserId['fromTag'])
+    else:
+        mostTaggedUser = "N/A"
+
+    time_threshold = datetime.now() - timedelta(weeks=1)
+    tagsThisWeekObject = Tag.objects.all().values('toTag').filter(toTag=userObject).filter(timestamp__gt=time_threshold).annotate(total=Count('toTag')).order_by('-total').first()
+    if (tagsThisWeekObject is not None):
+        tagsThisWeek = tagsThisWeekObject['total'] or 0
+    else:
+        tagsThisWeek = 0
+
+    # Get a list of recent tags
+    tags = Tag.objects.all().filter(toTag=userObject).order_by('-timestamp')[:100]
+
+    context = {
+        'timesTagged': timesTagged,
+        'mostTaggedUser': mostTaggedUser,
+        'tagsThisWeek': tagsThisWeek,
+        'tags': tags
+    }
+    return render(request, "tag/user.html", context)
 
 @login_required(login_url='/login/')
 def newTag(request):

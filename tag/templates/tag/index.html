@@ -8,52 +8,56 @@ Home
 {% endblock %}
 
 {% block content %}
-    <div class="container card-container">
-        <legend class="border-bottom mb-4">{{ itUser }} is it!</legend>
-        <p>{{ mostTaggedUser }} has been tagged the most, {{ mostTaggedCount }} times!</p>
-        <button type="button" id="openTagModal" class="newTagModal btn btn-primary" data-toggle="modal" data-target="#tagModal" disabled=true>
-            Tag a Friend!
-        </button>
+    <div class="row">
+        <div class="container card-container">
+            <legend class="border-bottom mb-4">{{ itUser }} is it!</legend>
+            <p>{{ mostTaggedUser }} has been tagged the most, {{ mostTaggedCount }} times!</p>
+            <button type="button" id="openTagModal" class="newTagModal btn btn-primary" data-toggle="modal" data-target="#tagModal" disabled=true>
+                Tag a Friend!
+            </button>
+        </div>
     </div>
     <br>
-    <br>
-    <div class="container card-container">
-        <legend class="border-bottom mb-4">Recent Tags</legend>
-        <div class="row">
-            <div class="col">
-                {% if tags %}
-                    <table id="tagsTable">
-                        <tr>
-                            <th>Tag</th>
-                            <th>Timestamp</th>
-                            <th>Message</th>
-                        </tr>
-                        {% for tag in tags %}
-                            {% if tag.toTag == user %}
-                                <tr>
-                                    <td style="font-weight:bold">{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
-                                    <td style="font-weight:bold">{{ tag.timestamp }}</td>
-                                    <td style="font-weight:bold">{{ tag.message }} </td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
-                                    <td>{{ tag.timestamp }}</td>
-                                    <td>{{ tag.message }} </td>
-                                </tr>
-                            {% endif %}
-                        {% empty %}
+    <div class="row">
+        <div class="container card-container">
+            <legend class="border-bottom mb-4">Recent Tags</legend>
+            <div class="row">
+                <div class="col">
+                    {% if tags %}
+                        <table id="tagsTable">
+                            <tr>
+                                <th>Tag</th>
+                                <th>Timestamp</th>
+                                <th>Message</th>
+                            </tr>
+                            {% for tag in tags %}
+                                {% if tag.toTag == user %}
+                                    <tr>
+                                        <td style="font-weight:bold">{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                        <td style="font-weight:bold">{{ tag.timestamp }}</td>
+                                        <td style="font-weight:bold">{{ tag.message }} </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                        <td>{{ tag.timestamp }}</td>
+                                        <td>{{ tag.message }} </td>
+                                    </tr>
+                                {% endif %}
+                            {% empty %}
 
-                        {% endfor %}
+                            {% endfor %}
 
-                    </table>
+                        </table>
 
-                {% else %}
-                    <p>No tags yet! Tag one of your friends to get things started!</p>
-                {% endif %}
+                    {% else %}
+                        <p>No tags yet! Tag one of your friends to get things started!</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+
 
     <!-- Tag Modal -->
     <div class="modal fade" id="tagModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
