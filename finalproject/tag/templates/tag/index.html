@@ -1,0 +1,138 @@
+{% extends "tag/layout.html" %}
+{% load crispy_forms_tags %}
+{% load tz %}
+{% localtime on %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+    <div class="container card-container">
+        <h5>{{ itUser }} is it!</h5>
+        <button type="button" id="openTagModal" class="newTagModal btn btn-primary" data-toggle="modal" data-target="#tagModal" disabled=true>
+            Tag a Friend!
+        </button>
+    </div>
+    <br>
+    <div class="container card-container">
+        <div class="row">
+            <div class="col">
+                {% if tags %}
+                    <table id="tagsTable">
+                        <tr>
+                            <th>Tag</th>
+                            <th>Timestamp</th>
+                            <th>Message</th>
+                        </tr>
+                        {% for tag in tags %}
+                            <tr>
+                                <td>{{ tag.fromTag }} tagged {{ tag.toTag }}</td>
+                                <td>{{ tag.timestamp }}</td>
+                                <td>{{ tag.message }} </td>
+                            </tr>
+                        {% empty %}
+
+                        {% endfor %}
+
+                    </table>
+
+                {% else %}
+                    <p>No tags yet! Tag one of your friends to get things started!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tag Modal -->
+    <div class="modal fade" id="tagModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tagModalLabel">Tag a Friend!</h5>
+                <button type="button" class="tagModalClose close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div>
+                        <form action="{% url 'newTag' %}" method="POST">
+                            {% csrf_token %}
+                            <fieldset class="form-group" id="tagFieldset">
+                                {{ tagModelForm|crispy }}
+                            </fieldset>
+                            <button type="button" id="tagSubmit" class="btn btn-primary" onclick="sendTag()">Tag!</button>
+                        </form>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for(var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // is this the cookie we want?
+                    if(cookie.substring(0, name.length+1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length+1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function addNewTag(newTag) {
+            console.info(newTag);
+        }
+
+        function sendTag() {
+            // Get the tag elements
+            toTag = document.getElementById('tag_toTag').value;
+            message = document.getElementById('tag_message').value;
+
+            // Create a new HTTP Request
+
+            var CSRFToken = null;
+            // Get the CSRF Token
+            CSRFToken = getCookie('csrftoken');
+
+            const request = new XMLHttpRequest();
+            request.open('POST','/newTag');
+            request.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+            request.onload = newTag => {
+                    closeTagModal();
+                    location.reload(); // Refresh the page
+                };
+
+            const data = new FormData();
+            data.append('toTag', toTag);
+            data.append('message', message)
+
+            // Send the request
+            request.send(data);
+
+        };
+
+        function closeTagModal() {
+            $('#tagModal').modal('hide');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Disable the Tag button if you're not it
+            if ("{{ user.username }}" == "{{ itUser }}") {
+                document.getElementById("openTagModal").disabled = false
+            };
+        });
+    </script>
+
+{% endblock content %}
+
+{% endlocaltime %}
